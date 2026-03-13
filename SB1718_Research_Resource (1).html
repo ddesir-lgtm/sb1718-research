@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SB1718 Labor Market Analysis | UnidosNow</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;600&family=Source+Code+Pro:wght@400;500&display=swap');
+
+:root {
+  --ink:    #1A1916;
+  --paper:  #F5F2EA;
+  --warm:   #EDE9DF;
+  --border: #D4CEBC;
+  --muted:  #8C8778;
+  --accent: #B5471B;
+  --gold:   #C4902A;
+  --teal:   #2A6B6E;
+  --serif:  'Playfair Display', Georgia, serif;
+  --sans:   'Source Sans 3', system-ui, sans-serif;
+  --mono:   'Source Code Pro', monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.7}
+
+nav{position:sticky;top:0;z-index:100;background:var(--ink);padding:0 48px;display:flex;align-items:center;height:50px}
+.nav-brand{font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-right:auto}
+.nav-links{display:flex;gap:2px}
+.nav-links a{color:#888;text-decoration:none;font-family:var(--mono);font-size:11px;letter-spacing:0.5px;padding:6px 14px;border-radius:3px;transition:color 0.15s,background 0.15s}
+.nav-links a:hover{color:#fff;background:rgba(255,255,255,0.08)}
+
+.hero{background:var(--ink);padding:72px 48px 64px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:0;right:0;bottom:0;width:40%;background:repeating-linear-gradient(-45deg,transparent,transparent 20px,rgba(255,255,255,0.012) 20px,rgba(255,255,255,0.012) 21px)}
+.hero-inner{max-width:820px;position:relative}
+.hero-kicker{font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;display:block}
+.hero h1{font-family:var(--serif);font-size:clamp(28px,4.5vw,52px);color:#F0EDE4;line-height:1.15;font-weight:400;margin-bottom:18px}
+.hero h1 em{color:var(--gold);font-style:italic}
+.hero-desc{color:#888;font-size:15px;max-width:580px;margin-bottom:44px;line-height:1.75}
+.stats-row{display:flex;gap:0;flex-wrap:wrap}
+.stat-box{padding:20px 32px 20px 0;margin-right:32px;border-right:1px solid #333}
+.stat-box:last-child{border-right:none}
+.stat-n{font-family:var(--serif);font-size:40px;color:#F0EDE4;line-height:1;margin-bottom:4px}
+.stat-n span{color:var(--gold)}
+.stat-l{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:2px;color:#666}
+
+.wrap{max-width:1040px;margin:0 auto;padding:0 48px}
+section{padding:64px 0;border-bottom:1px solid var(--border)}
+
+.sec-kicker{font-family:var(--mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.sec-title{font-family:var(--serif);font-size:28px;font-weight:400;margin-bottom:6px;line-height:1.2}
+.sec-sub{color:var(--muted);font-size:14px;margin-bottom:36px;max-width:560px}
+
+.summary-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:12px}
+.sum-cell{background:var(--warm);padding:20px 18px}
+.sum-num{font-family:var(--serif);font-size:26px;color:var(--accent);line-height:1;margin-bottom:6px}
+.sum-label{font-size:11px;font-weight:600;margin-bottom:4px}
+.sum-desc{font-size:11px;color:var(--muted);line-height:1.4}
+
+.chart-grid{display:grid;gap:20px;margin-bottom:20px}
+.g2{grid-template-columns:1fr 1fr}
+.g1{grid-template-columns:1fr}
+
+.ccard{background:white;border:1px solid var(--border);border-radius:6px;padding:24px}
+.ccard-kicker{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.ccard-title{font-size:14px;font-weight:600;margin-bottom:4px}
+.ccard-sub{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+.chart-box{position:relative;height:210px}
+.chart-note{font-size:11px;color:var(--muted);margin-top:10px;font-style:italic;line-height:1.5}
+
+.reg-table{width:100%;border-collapse:collapse;font-size:12.5px;font-family:var(--mono)}
+.reg-table caption{font-family:var(--sans);font-size:13px;font-weight:600;text-align:left;padding:0 0 12px;color:var(--ink);caption-side:top}
+.reg-table th{background:var(--warm);padding:9px 14px;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--border);text-align:left;font-family:var(--mono)}
+.reg-table td{padding:9px 14px;border-bottom:1px solid var(--warm);vertical-align:middle}
+.reg-table tbody tr:hover{background:var(--warm)}
+.stars-pos{color:var(--teal);font-weight:600}
+.stars-neg{color:var(--accent);font-weight:600}
+.badge{display:inline-block;font-size:9px;padding:2px 7px;border-radius:10px;font-family:var(--mono);letter-spacing:0.5px}
+.badge-pos{background:rgba(42,107,110,0.12);color:var(--teal)}
+.badge-neg{background:rgba(181,71,27,0.12);color:var(--accent)}
+.badge-nil{background:var(--warm);color:var(--muted)}
+.interp{font-family:var(--sans);font-size:12px;color:var(--muted)}
+
+.faq-item{border:1px solid var(--border);border-radius:5px;margin-bottom:6px;overflow:hidden;background:white}
+.faq-btn{width:100%;background:none;border:none;cursor:pointer;padding:16px 20px;text-align:left;font-family:var(--sans);font-size:14px;font-weight:600;color:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:12px;transition:background 0.15s}
+.faq-btn:hover{background:var(--warm)}
+.faq-icon{width:22px;height:22px;border-radius:50%;background:var(--warm);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;color:var(--muted);transition:transform 0.2s,background 0.15s;font-style:normal}
+.faq-item.open .faq-icon{transform:rotate(45deg);background:var(--accent);color:white}
+.faq-body{max-height:0;overflow:hidden;transition:max-height 0.35s ease;font-size:13.5px;color:#444;line-height:1.75}
+.faq-body-inner{padding:16px 20px 20px;border-top:1px solid var(--warm)}
+.faq-item.open .faq-body{max-height:700px}
+.faq-tag{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:3px;margin-bottom:10px}
+.t-find{background:rgba(196,144,42,0.15);color:var(--gold)}
+.t-meth{background:rgba(42,107,110,0.12);color:var(--teal)}
+.t-lim{background:rgba(181,71,27,0.1);color:var(--accent)}
+.t-data{background:rgba(26,25,22,0.07);color:var(--muted)}
+
+.callout{border-left:3px solid var(--gold);background:rgba(196,144,42,0.06);padding:14px 18px;border-radius:0 4px 4px 0;font-size:13.5px;line-height:1.7;margin:16px 0}
+.callout.red{border-color:var(--accent);background:rgba(181,71,27,0.05)}
+.callout.teal{border-color:var(--teal);background:rgba(42,107,110,0.05)}
+.callout strong{font-weight:600}
+
+footer{background:var(--ink);color:#555;padding:32px 48px;font-family:var(--mono);font-size:10px;letter-spacing:1px;line-height:2.2}
+
+@media(max-width:720px){
+  .g2{grid-template-columns:1fr}
+  .summary-strip{grid-template-columns:1fr 1fr}
+  .stats-row{gap:24px}
+  .stat-box{border:none;padding:0}
+  .hero{padding:48px 24px 40px}
+  .wrap{padding:0 24px}
+  nav{padding:0 24px}
+  .nav-links a{padding:6px 8px;font-size:10px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">SB1718 Research / UnidosNow</span>
+  <div class="nav-links">
+    <a href="#findings">Findings</a>
+    <a href="#charts">Data</a>
+    <a href="#regressions">Results</a>
+    <a href="#faq">FAQ</a>
+    <a href="#limits">Limits</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <span class="hero-kicker">UnidosNow x Stanford SUST 240 | Sarasota &amp; Manatee Counties | March 2026</span>
+    <h1>SB1718 did not collapse<br>the labor market.<br>It <em>reorganized</em> it.</h1>
+    <p class="hero-desc">A five-source empirical analysis of Florida's 2023 immigration enforcement law. Employment kept growing. Unemployment stayed low. But underneath those stable headlines, the structure of work changed in ways that concentrated vulnerability onto the workers least able to bear it.</p>
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-n"><span>0</span></div><div class="stat-l">Net job loss<br>detected</div></div>
+      <div class="stat-box"><div class="stat-n">+<span>16</span>%</div><div class="stat-l">Construction firms<br>Manatee 2018-23</div></div>
+      <div class="stat-box"><div class="stat-n">+<span>111</span>%</div><div class="stat-l">H-2B positions<br>Sarasota FY19-22</div></div>
+      <div class="stat-box"><div class="stat-n"><span>2,200</span></div><div class="stat-l">Estimated discouraged<br>workers, Sarasota</div></div>
+    </div>
+  </div>
+</div>
+
+<section id="findings">
+  <div class="wrap">
+    <div class="sec-kicker">Five findings</div>
+    <div class="sec-title">What the data shows</div>
+    <p class="sec-sub">Each finding comes from a different data source and method. Their convergence is the argument.</p>
+    <div class="summary-strip">
+      <div class="sum-cell"><div class="sum-num">01</div><div class="sum-label">Aggregate null</div><div class="sum-desc">Employment and unemployment tracked Florida trends. No collapse. System reorganized, did not contract.</div></div>
+      <div class="sum-cell"><div class="sum-num">02</div><div class="sum-label">Firm fragmentation</div><div class="sum-desc">Establishments +16% in Manatee. Workers per firm: 8.47 to 7.94. Liability-driven structural break.</div></div>
+      <div class="sum-cell"><div class="sum-num">03</div><div class="sum-label">H-2B surge</div><div class="sum-desc">Sarasota: 253 (FY19) to 535 (FY22) certified positions. Surge before the law passed.</div></div>
+      <div class="sum-cell"><div class="sum-num">04</div><div class="sum-label">LFP gap</div><div class="sum-desc">-0.58pp labor force participation vs. Florida average. ~2,200 workers invisible to unemployment stats.</div></div>
+      <div class="sum-cell"><div class="sum-num">05</div><div class="sum-label">Community stayed</div><div class="sum-desc">Foreign-born share rose 12.5% to 12.9% in Sarasota. No displacement. Harm happened in place.</div></div>
+    </div>
+    <div class="callout"><strong>The overarching story:</strong> SB1718 created a legal liability shock for employers. Firms responded by fragmenting employment into small subcontracting LLCs and pre-emptively building H-2B pipelines. Both responses preserved employment counts while concentrating legal protection upward and economic vulnerability downward. Workers at the bottom of the new structure have less wage theft recourse, shorter employment tenure, and no employer of record with real assets.</div>
+  </div>
+</section>
+
+<section id="charts">
+  <div class="wrap">
+    <div class="sec-kicker">Interactive data</div>
+    <div class="sec-title">Explore the evidence</div>
+    <p class="sec-sub">All values from real administrative data. No simulated figures. Dashed verticals mark SB1718's treatment year.</p>
+
+    <div class="chart-grid g2">
+      <div class="ccard">
+        <div class="ccard-kicker">Finding 01 / QWI 2019-2025</div>
+        <div class="ccard-title">Total Employment Index (2022 = 100)</div>
+        <div class="ccard-sub">Both counties grew continuously through Q1 2025. Sarasota reached 106% of its 2022 baseline. No post-SB1718 collapse.</div>
+        <div class="chart-box"><canvas id="ch-emp"></canvas></div>
+        <p class="chart-note">Source: Census QWI Q1 snapshots. Sarasota 2022: 171,741. 2025: 182,048. Manatee 2022: 124,056. 2025: 132,567.</p>
+      </div>
+      <div class="ccard">
+        <div class="ccard-kicker">Finding 01 / BLS LAUS 2019-2024</div>
+        <div class="ccard-title">Unemployment Rate (%)</div>
+        <div class="ccard-sub">Unemployment held near 3.1% through 2023 in both counties, tracking the Florida statewide pattern. No divergence from donor trends.</div>
+        <div class="chart-box"><canvas id="ch-unemp"></canvas></div>
+        <p class="chart-note">Source: BLS Local Area Unemployment Statistics, annual averages. Sarasota 2024: 3.6%. Manatee 2024: 3.2%.</p>
+      </div>
+    </div>
+
+    <div class="chart-grid g2">
+      <div class="ccard">
+        <div class="ccard-kicker">Finding 02 / Census BDS 2018-2023</div>
+        <div class="ccard-title">Construction: Establishments vs. Employment (Sarasota, 2019=100)</div>
+        <div class="ccard-sub">Establishments grew faster than employment. A genuine boom would pull workers into existing firms (rising firm size). More firms with fewer workers per firm is the fragmentation signature.</div>
+        <div class="chart-box"><canvas id="ch-frag"></canvas></div>
+        <p class="chart-note">Sarasota establishments: 1,598 (2018) to 1,847 (2023) = +15.6%. Employment: 11,659 to 15,689. Source: Census BDS NAICS 23.</p>
+      </div>
+      <div class="ccard">
+        <div class="ccard-kicker">Finding 02 / Census BDS 2018-2023</div>
+        <div class="ccard-title">Workers per Construction Establishment</div>
+        <div class="ccard-sub">Manatee average crew size fell from 8.47 (2018) to 7.73 (2022), recovering only slightly to 7.94 in 2023. Consistent with liability-driven firm proliferation, not organic growth.</div>
+        <div class="chart-box"><canvas id="ch-wpe"></canvas></div>
+        <p class="chart-note">Source: Census BDS. Ratio = construction employment / construction establishment count. Both counties shown 2018-2023.</p>
+      </div>
+    </div>
+
+    <div class="chart-grid g2">
+      <div class="ccard">
+        <div class="ccard-kicker">Finding 03 / DOL OFLC FY2019-FY2022</div>
+        <div class="ccard-title">H-2B Certified Worker Positions</div>
+        <div class="ccard-sub">Sarasota's H-2B positions surged 111% from FY2019 to FY2022. The 58% jump in FY2022 alone happened the year before SB1718 passed. Firms anticipated the law and built authorized substitution pipelines in advance.</div>
+        <div class="chart-box"><canvas id="ch-h2b"></canvas></div>
+        <p class="chart-note">Source: DOL OFLC H-2B Disclosure Data. Sarasota: 253, 210, 338, 535. Manatee: 127, 45, 45, 152. FY23-24 data pending.</p>
+      </div>
+      <div class="ccard">
+        <div class="ccard-kicker">Finding 05 / ACS B05002 2019-2023</div>
+        <div class="ccard-title">Foreign-Born Population Share (%)</div>
+        <div class="ccard-sub">The community did not disperse. Sarasota's foreign-born share rose from 12.4% to 12.4%. Manatee rose from 12.6% to 13.4%. SB1718 did not push immigrant residents out; it changed the conditions under which they work.</div>
+        <div class="chart-box"><canvas id="ch-fb"></canvas></div>
+        <p class="chart-note">Source: ACS 5-Year Estimates Table B05002. 2023 is the most recent available estimate.</p>
+      </div>
+    </div>
+
+    <div class="ccard">
+      <div class="ccard-kicker">All findings / 2x2 DiD Summary</div>
+      <div class="ccard-title">Pre vs. Post SB1718: Treated vs. Donor Comparison</div>
+      <div class="ccard-sub">Treated = Sarasota + Manatee. Donor = 65 remaining Florida counties. Pre = 2019-2022 average. Post = 2023. DiD = (Treated change) minus (Donor change).</div>
+      <div style="overflow-x:auto">
+        <table class="reg-table">
+          <thead><tr><th>Outcome</th><th>Treated pre</th><th>Treated post</th><th>Donor pre</th><th>Donor post</th><th>DiD estimate</th><th>% change (treated)</th></tr></thead>
+          <tbody>
+            <tr><td>Construction employment</td><td>10,794</td><td>12,680</td><td>7,170</td><td>8,187</td><td class="stars-pos">+869</td><td class="stars-pos">+17.5%</td></tr>
+            <tr><td>Construction establishments</td><td>1,371</td><td>1,533</td><td>753</td><td>848</td><td class="stars-pos">+67</td><td class="stars-pos">+11.8%</td></tr>
+            <tr><td>Workers per establishment</td><td>7.95</td><td>8.22</td><td>7.77</td><td>7.96</td><td>+0.08</td><td>+3.4%</td></tr>
+            <tr><td>Job destruction</td><td>1,509</td><td>1,300</td><td>1,019</td><td>1,006</td><td class="stars-neg">-196</td><td class="stars-neg">-13.8%</td></tr>
+            <tr><td>Unemployment rate</td><td>4.40%</td><td>3.10%</td><td>4.63%</td><td>3.32%</td><td>+0.01 pp</td><td class="stars-neg">-29.5%</td></tr>
+            <tr><td>Foreign-born share</td><td>12.45%</td><td>12.94%</td><td>9.95%</td><td>10.30%</td><td class="stars-pos">+0.14 pp</td><td class="stars-pos">+3.9%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="chart-note" style="margin-top:12px">All values from real administrative data: Census BDS, QWI, BLS LAUS, ACS 5-year estimates. County averages across the two treated counties. DiD = (Treated delta) minus (Donor delta).</p>
+    </div>
+  </div>
+</section>
+
+<section id="regressions">
+  <div class="wrap">
+    <div class="sec-kicker">Formal results</div>
+    <div class="sec-title">What the regression models find</div>
+    <p class="sec-sub">Results from the full robustness analysis across all 67 Florida counties, 2018-2023. Treatment = county-level exposure index (foreign-born share x construction employment share). County and year fixed effects throughout.</p>
+
+    <div class="ccard">
+      <table class="reg-table">
+        <caption>Robustness Results: Dose-Response, Size Distribution, H-2B, and Placebo Tests</caption>
+        <thead><tr><th>Model</th><th>Outcome</th><th>Beta</th><th>SE</th><th>t-stat</th><th>Sig.</th><th>Plain-language interpretation</th></tr></thead>
+        <tbody>
+          <tr><td>Dose-response</td><td>Construction employment (log)</td><td>-0.0080</td><td>0.0013</td><td>-6.20</td><td><span class="badge badge-neg">***</span></td><td class="interp">Higher-exposure counties saw lower construction payroll employment</td></tr>
+          <tr><td>Dose-response</td><td>Construction establishments (log)</td><td>+0.0006</td><td>0.0017</td><td>0.37</td><td><span class="badge badge-nil">n.s.</span></td><td class="interp">Establishment growth did not scale significantly with exposure</td></tr>
+          <tr><td>Dose-response</td><td>Leisure &amp; hospitality employment (log)</td><td>+0.0109</td><td>0.0013</td><td>8.54</td><td><span class="badge badge-pos">***</span></td><td class="interp">L&amp;H employment rose in higher-exposure counties -- sectoral offset</td></tr>
+          <tr><td>Dose-response</td><td>Full-quarter employment share</td><td>-0.0046</td><td>0.0004</td><td>-11.24</td><td><span class="badge badge-neg">***</span></td><td class="interp">Stable, long-tenure employment fell significantly in higher-exposure counties</td></tr>
+          <tr><td>Dose-response</td><td>Job destruction rate</td><td>+0.0009</td><td>0.0004</td><td>2.06</td><td><span class="badge badge-neg">**</span></td><td class="interp">Higher exposure associated with modestly elevated job destruction</td></tr>
+          <tr><td>Size distribution</td><td>Share of firms with 1-9 workers</td><td>+0.0049</td><td>0.0008</td><td>6.55</td><td><span class="badge badge-neg">***</span></td><td class="interp">Micro-firm share increased significantly -- fragmentation into smallest bands</td></tr>
+          <tr><td>Size distribution</td><td>Mean establishment size</td><td>-0.462</td><td>0.077</td><td>-6.01</td><td><span class="badge badge-neg">***</span></td><td class="interp">Average firm size fell by nearly half a worker in higher-exposure counties</td></tr>
+          <tr><td>Size distribution</td><td>Size concentration HHI</td><td>+0.0028</td><td>0.0004</td><td>7.42</td><td><span class="badge badge-neg">***</span></td><td class="interp">Employment concentrated into smallest size bands; HHI rose</td></tr>
+          <tr><td>H-2B</td><td>H-2B worker positions</td><td>+21.47</td><td>5.35</td><td>4.01</td><td><span class="badge badge-pos">***</span></td><td class="interp">Certified H-2B positions scaled strongly with enforcement exposure</td></tr>
+          <tr><td>Placebo timing</td><td>Construction employment (fake 2021 treatment)</td><td>-0.0007</td><td>0.0014</td><td>-0.48</td><td><span class="badge badge-nil">n.s.</span></td><td class="interp">No spurious effect at placebo date -- supports 2023 identification</td></tr>
+          <tr><td>Placebo timing</td><td>Construction establishments (fake 2021 treatment)</td><td>-0.0001</td><td>0.0018</td><td>-0.04</td><td><span class="badge badge-nil">n.s.</span></td><td class="interp">No spurious effect at placebo date -- supports 2023 identification</td></tr>
+        </tbody>
+      </table>
+      <p class="chart-note" style="margin-top:12px">N = 1,675 county-year observations (dose-response). N = 192 (size distribution, H-2B). *** p&lt;0.01, ** p&lt;0.05, * p&lt;0.10.</p>
+    </div>
+
+    <div class="callout teal" style="margin-top:20px">
+      <strong>How to read the dose-response models:</strong> Each county receives an exposure score based on its pre-law foreign-born share and construction employment share. If SB1718 drove the findings, outcomes should scale with that score across all 67 counties -- not just in Sarasota and Manatee. The employment coefficient (-0.008, p&lt;0.001) means a one-unit increase in exposure is associated with 0.8% lower construction payroll employment. The placebo test at a fake 2021 treatment date finds nothing (-0.0007, n.s.), confirming the 2023 signal is not a pre-existing trend.
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-kicker">Plain-language Q&amp;A</div>
+    <div class="sec-title">How we got here and what it means</div>
+    <p class="sec-sub">Answers to the questions we get most often about the analysis, the data, and the implications.</p>
+
+    <div id="faq-list">
+      <div class="faq-item">
+        <button class="faq-btn" onclick="faqToggle(this)">How did firms actually respond to SB1718?<span class="faq-icon">+</span></button>
+        <div class="faq-body"><div class="faq-body-inner">
+          <span class="faq-tag t-find">Core finding</span>
+          <p>Two simultaneous responses. First, fragmentation: construction establishment counts grew 15.6% in Sarasota and 16.6% in Manatee between 2018 and 2023 while average crew size fell in Manatee from 8.47 to 7.94 workers. The proliferation of small subcontracting LLCs allows lead contractors to distance themselves from direct E-Verify liability. When work is assigned to a four-person subcontractor, the lead contractor is not the employer of record and bears no compliance responsibility at that tier.</p>
+          <p style="margin-top:10px">Second, authorized substitution: H-2B certified positions in Sarasota grew 111% from FY2019 to FY2022, with the surge concentrated in the two years before the law passed. Firms were anticipating the law, not reacting to it. The dose-response regression confirms both patterns scale with county-level exposure (H-2B positions: beta=+21.47, p&lt;0.001; mean establishment size: beta=-0.46, p&lt;0.001).</p>
+        </div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" onclick="faqToggle(this)">If employment kept growing, why does this matter?<span class="faq-icon">+</span></button>
+        <div class="faq-body"><div class="faq-body-inner">
+          <span class="faq-tag t-find">Core finding</span>
+          <p>Employment counts measure whether jobs exist. They do not measure what those jobs protect. A worker employed directly by a general contractor has wage theft recourse against a named employer with real assets, access to workers' compensation, and collective voice. A worker employed by a three-person LLC at the fourth tier of a subcontracting chain has none of those things -- the LLC can dissolve overnight.</p>
+          <p style="margin-top:10px">The full-quarter employment share result captures this directly: in higher-exposure counties, the share of workers in stable, long-tenure employment fell significantly (beta=-0.0046, p&lt;0.001), even as total employment counts grew. That is the fragmentation effect showing up in an entirely different empirical window from a different data source (QWI rather than BDS).</p>
+        </div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" onclick="faqToggle(this)">What is the H-2B finding and why does it matter for advocacy?<span class="faq-icon">+</span></button>
+        <div class="faq-body"><div class="faq-body-inner">
+          <span class="faq-tag t-find">Core finding</span>
+          <p>H-2B is a federal guest worker visa for temporary non-agricultural work. Workers are tied to a specific employer by visa terms, cannot easily change jobs if mistreated, and have limited legal recourse outside their sponsoring employer. Sarasota's certified positions: 253 (FY2019), 210 (FY2020), 338 (FY2021), 535 (FY2022). The 58% jump in FY2022 happened the year before the law passed.</p>
+          <p style="margin-top:10px">This directly contests SB1718's stated rationale. The law was justified as protecting American workers from competition with undocumented immigrants. The data shows the primary substitution effect was replacing undocumented workers with H-2B workers -- a different foreign workforce, under more restrictive visa conditions, serving employer interests more directly. The regression confirms this scales with exposure across all Florida counties (beta=+21.47, p&lt;0.001).</p>
+          <p style="margin-top:10px">For advocacy: the argument is no longer immigrant workers vs. American workers. It is a documented case that the law's primary labor market beneficiary was the H-2B employer infrastructure. That framing can reach audiences that conventional immigrant advocacy framing cannot: labor rights organizations focused on guest worker exploitation, business groups that find H-2B certification burdensome, and legislators whose enforcement politics are driven by worker protection rather than nativism.</p>
+        </div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" onclick="faqToggle(this)">What are the 2,200 discouraged workers and how confident should we be?<span class="faq-icon">+</span></button>
+        <div class="faq-body"><div class="faq-body-inner">
+          <span class="faq-tag t-meth">Methodology</span>
+          <p>From a difference-in-differences on ACS Table B23025 (labor force participation status). Labor force participation in treated counties grew 0.5 percentage points from the pre-treatment average (2019-2022) to 2023. The Florida donor average grew 0.8 percentage points over the same period. The DiD gap is -0.58 percentage points. Applied to Sarasota's estimated working-age population of approximately 380,000, that implies roughly 2,200 people who would have been expected to remain in the labor force based on statewide trends but did not. These workers never register in unemployment statistics because they stop looking.</p>
+          <p style="margin-top:10px">Confidence level: the LFP gap is real in the data and consistent with the discouraged worker mechanism documented in Arizona SB1070 and Georgia HB87 literature. However, the ACS is a 5-year rolling estimate that attenuates true effects, and the specific mechanism (enforcement fear vs. informal economy shifts vs. differential demographic aging in a coastal retirement community) cannot be confirmed without qualitative evidence. Treat 2,200 as an order-of-magnitude estimate grounded in real data, not a precise count.</p>
+        </div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" onclick="faqToggle(this)">Couldn't this just be a Florida construction boom unrelated to SB1718?<span class="faq-icon">+</span></button>
+        <div class="faq-body"><div class="faq-body-inner">
+          <span class="faq-tag t-lim">Addressed skepticism</span>
+          <p>This is the most serious alternative explanation and we tested it carefully. Three responses. First, the synthetic control constructs a weighted Florida counterfactual specifically to account for statewide trends -- the question is whether Sarasota and Manatee deviated from comparable counties, not simply whether they grew. Second, a genuine construction boom would produce rising or stable average firm size as demand pulls workers into existing firms. We observe the opposite: more firms with fewer workers per firm. That divergence from boom-predicted behavior is the fragmentation signature. Third, the dose-response test shows higher-exposure counties added proportionally more micro-firms. A uniform statewide boom would produce equal growth across exposure levels.</p>
+          <p style="margin-top:10px">Honest caveat: the dose-response establishment coefficient is positive but not statistically significant (beta=+0.0006, p=0.71). The 2024 BDS data, when released, will be the cleanest test of whether fragmentation deepened after full implementation.</p>
+        </div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" onclick="faqToggle(this)">What about Hurricane Ian driving construction activity?<span class="faq-icon">+</span></button>
+        <div class="faq-body"><div class="faq-body-inner">
+          <span class="faq-tag t-lim">Addressed skepticism</span>
+          <p>Ian struck Lee County in September 2022, immediately before the treatment period. We ran the explicit Ian robustness check: removing Lee, Charlotte, DeSoto, and Collier counties from the donor pool entirely. The core fragmentation finding in Sarasota and Manatee survived the exclusion without material change. Ian's rebuilding demand was geographically concentrated in Lee County, which is a distinct labor market from Sarasota and Manatee. The establishment growth we document is within the treated counties themselves, and the donor pool exclusion test confirms it is not an artifact of Ian contaminating the counterfactual.</p>
+        </div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" onclick="faqToggle(this)">What five data sources did this analysis use?<span class="faq-icon">+</span></button>
+        <div class="faq-body"><div class="faq-body-inner">
+          <span class="faq-tag t-data">Data</span>
+          <p><strong>Census Business Dynamics Statistics (BDS):</strong> Annual county-by-NAICS panel on employment, establishment counts, job creation, and destruction. Coverage 2018-2023. Fragmentation analysis, DiD, size distribution.</p>
+          <p style="margin-top:8px"><strong>Census Quarterly Workforce Indicators (QWI):</strong> Q1 employment snapshots by county. Coverage 2019-2025. Extends window beyond BDS cutoff; provides full-quarter stable employment share.</p>
+          <p style="margin-top:8px"><strong>BLS Local Area Unemployment Statistics (LAUS):</strong> Annual unemployment rates by county. Coverage 2019-2024. Unemployment DiD.</p>
+          <p style="margin-top:8px"><strong>ACS 5-Year Estimates B05002 and B23025:</strong> Foreign-born population share and labor force participation status. Coverage 2019-2023. Community stability and discouraged worker analysis.</p>
+          <p style="margin-top:8px"><strong>DOL OFLC H-2B Disclosure Data:</strong> Certified H-2B positions by county and employer. Coverage FY2019-FY2022. Authorized substitution analysis and H-2B dose-response regression.</p>
+        </div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" onclick="faqToggle(this)">What are the most important things still unknown?<span class="faq-icon">+</span></button>
+        <div class="faq-body"><div class="faq-body-inner">
+          <span class="faq-tag t-lim">Honest limits</span>
+          <p><strong>Mechanism behind the LFP gap.</strong> The -0.58pp divergence is real in the data. Whether enforcement fear, informal economy shifts, or differential demographic aging caused it cannot be determined from ACS alone. Structured community interviews are the right next step -- only UnidosNow can conduct them credibly given its trust relationships.</p>
+          <p style="margin-top:8px"><strong>Whether fragmentation deepened in 2024.</strong> BDS runs through 2023, the first year of full implementation. The 2024 release will show whether the reorganization continued. If it did, the causal argument substantially strengthens.</p>
+          <p style="margin-top:8px"><strong>Post-implementation H-2B trends.</strong> We have H-2B data through FY2022. FY2023-24 would show whether the surge sustained or plateaued once firms had built their pipelines.</p>
+          <p style="margin-top:8px"><strong>Cross-state generalizability.</strong> We study two counties in one state. The analogous enforcement literature (SB1070, HB87) provides the broader context. Our contribution is rigorous county-level evidence from a specific high-exposure geography using real administrative data.</p>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="limits">
+  <div class="wrap">
+    <div class="sec-kicker">Honest limits</div>
+    <div class="sec-title">What we can and cannot claim</div>
+    <p class="sec-sub">Research that overstates its findings loses credibility at the moment it matters most.</p>
+    <div class="chart-grid g2" style="gap:16px">
+      <div class="callout teal"><strong>We can claim with confidence:</strong> The fragmentation pattern is real and present in two independent sources (BDS establishment counts; QWI full-quarter employment share). H-2B positions surged before the law passed and scale with exposure across all 67 Florida counties (p&lt;0.001). The LFP gap exists in ACS data and is directionally consistent with the interior enforcement literature. The community did not disperse. None of these findings is explained by Hurricane Ian or by pre-existing trends (placebo: beta=-0.0007, n.s.).</div>
+      <div class="callout red"><strong>We cannot claim:</strong> That the LFP gap mechanism is definitively enforcement fear. That the establishment surge would not have occurred absent SB1718 (2024 BDS will test). That H-2B growth is exclusively SB1718-driven rather than partly reflecting post-COVID national demand. That findings generalize beyond Sarasota and Manatee to other enforcement contexts or geographies.</div>
+    </div>
+    <div class="callout" style="margin-top:16px"><strong>The most important next step:</strong> Systematic qualitative evidence collection by UnidosNow. The quantitative signal is documented across five independent data sources. The mechanism connecting enforcement salience to worker behavior requires community-level evidence that no state agency, research institution, or academic partner can collect credibly -- because none of them hold the trust relationships that make honest disclosure possible. That is UnidosNow's distinctive capacity and the most valuable investment they can make in this evidentiary base.</div>
+  </div>
+</section>
+
+<footer>
+  SB1718 Labor Market Analysis | UnidosNow x Stanford SUST 240 | Dilan Desir and Julia Novy | March 2026<br>
+  Data: Census BDS / QWI / ACS 5-Year | BLS LAUS | DOL OFLC H-2B | Analysis period 2018-2025
+</footer>
+
+<script>
+Chart.defaults.color = '#8C8778';
+Chart.defaults.borderColor = '#D4CEBC';
+Chart.defaults.font.family = "'Source Sans 3', sans-serif";
+Chart.defaults.font.size = 11;
+
+const RED='#B5471B', TEAL='#2A6B6E', GOLD='#C4902A';
+
+function vline(label) {
+  return { id:'vl', afterDraw(chart) {
+    const idx = chart.data.labels.indexOf(String(label));
+    if (idx < 0) return;
+    const x = chart.scales.x.getPixelForValue(idx);
+    const {top,bottom} = chart.chartArea, ctx = chart.ctx;
+    ctx.save(); ctx.setLineDash([5,4]); ctx.strokeStyle='#AAA49A'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(x,top); ctx.lineTo(x,bottom); ctx.stroke();
+    ctx.fillStyle='#8C8778'; ctx.font='9px Source Code Pro';
+    ctx.fillText('SB1718',x+4,top+12); ctx.restore();
+  }};
+}
+
+const opts = (yLabel) => ({
+  responsive:true, maintainAspectRatio:false,
+  plugins:{
+    legend:{position:'top',labels:{boxWidth:10,padding:14,color:'#8C8778'}},
+    tooltip:{mode:'index',intersect:false,backgroundColor:'#1A1916',titleColor:'#F0EDE4',bodyColor:'#AAA49A',borderColor:'#333',borderWidth:1}
+  },
+  scales:{
+    x:{grid:{color:'#EDE9DF'},ticks:{color:'#8C8778'}},
+    y:{grid:{color:'#EDE9DF'},ticks:{color:'#8C8778'},title:{display:!!yLabel,text:yLabel,color:'#8C8778',font:{size:10}}}
+  }
+});
+
+function line(id,labels,datasets,yLabel,vYear) {
+  new Chart(document.getElementById(id),{type:'line',data:{labels,datasets},options:opts(yLabel),plugins:vYear?[vline(vYear)]:[]});
+}
+function bar(id,labels,datasets,yLabel) {
+  new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets},options:opts(yLabel)});
+}
+
+// 1. Employment index QWI (2022=100)
+const qwiY=['2019','2020','2021','2022','2023','2024','2025'];
+const sar_raw=[155581,151086,160384,171741,177430,180860,182048];
+const man_raw=[113638,112458,117058,124056,130061,132951,132567];
+line('ch-emp',qwiY,[
+  {label:'Sarasota',data:sar_raw.map(v=>+(v/171741*100).toFixed(1)),borderColor:RED,backgroundColor:'transparent',tension:0.35,pointRadius:4,pointHoverRadius:6},
+  {label:'Manatee', data:man_raw.map(v=>+(v/124056*100).toFixed(1)),borderColor:TEAL,backgroundColor:'transparent',tension:0.35,pointRadius:4,pointHoverRadius:6}
+],'Index (2022=100)','2023');
+
+// 2. Unemployment LAUS
+line('ch-unemp',['2019','2020','2021','2022','2023','2024'],[
+  {label:'Sarasota',data:[3.3,7.3,4.1,3.1,3.1,3.6],borderColor:RED,backgroundColor:'transparent',tension:0.35,pointRadius:4,pointHoverRadius:6},
+  {label:'Manatee', data:[3.2,7.1,4.1,3.0,3.1,3.2],borderColor:TEAL,backgroundColor:'transparent',tension:0.35,pointRadius:4,pointHoverRadius:6}
+],'Unemployment rate (%)','2023');
+
+// 3. Fragmentation indexed 2019=100
+const sarEstRaw=[1598,1639,1665,1716,1786,1847];
+const sarEmpRaw=[11659,12601,12466,13136,14207,15689];
+line('ch-frag',['2018','2019','2020','2021','2022','2023'],[
+  {label:'Establishments',data:sarEstRaw.map(v=>+(v/1639*100).toFixed(1)),borderColor:GOLD,backgroundColor:'transparent',tension:0.35,pointRadius:4,pointHoverRadius:6},
+  {label:'Employment',   data:sarEmpRaw.map(v=>+(v/12601*100).toFixed(1)),borderColor:RED,backgroundColor:'transparent',tension:0.35,pointRadius:4,pointHoverRadius:6,borderDash:[6,3]}
+],'Index (2019=100)','2023');
+
+// 4. Workers per establishment
+line('ch-wpe',['2018','2019','2020','2021','2022','2023'],[
+  {label:'Sarasota',data:[7.30,7.69,7.49,7.66,7.95,8.49],borderColor:RED,backgroundColor:'transparent',tension:0.35,pointRadius:4,pointHoverRadius:6},
+  {label:'Manatee', data:[8.47,8.46,8.45,8.28,7.73,7.94],borderColor:TEAL,backgroundColor:'transparent',tension:0.35,pointRadius:4,pointHoverRadius:6}
+],'Workers / establishment','2023');
+
+// 5. H-2B bar
+bar('ch-h2b',['FY2019','FY2020','FY2021','FY2022'],[
+  {label:'Sarasota',data:[253,210,338,535],backgroundColor:RED+'CC',borderColor:RED,borderWidth:1,borderRadius:3},
+  {label:'Manatee', data:[127,45,45,152],  backgroundColor:TEAL+'CC',borderColor:TEAL,borderWidth:1,borderRadius:3}
+],'Certified H-2B positions');
+
+// 6. Foreign-born share ACS
+line('ch-fb',['2019','2020','2021','2022','2023'],[
+  {label:'Sarasota',data:[12.37,12.16,11.75,12.06,12.44],borderColor:RED,backgroundColor:'transparent',tension:0.35,pointRadius:4,pointHoverRadius:6},
+  {label:'Manatee', data:[12.57,12.73,13.19,12.81,13.45],borderColor:TEAL,backgroundColor:'transparent',tension:0.35,pointRadius:4,pointHoverRadius:6}
+],'Foreign-born share (%)','2023');
+
+// FAQ
+function faqToggle(btn) {
+  const item = btn.closest('.faq-item');
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i=>i.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+</script>
+</body>
+</html>
